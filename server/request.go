@@ -8,9 +8,10 @@ import (
 	"github.com/omm-lang/omm/lang/types"
 )
 
+//OmmHTTPRequest represents an http.Request in omm
 type OmmHTTPRequest struct {
 	Method     types.OmmString
-	Url        types.OmmString
+	URL        types.OmmString
 	Protocol   types.OmmString
 	Header     types.OmmHash
 	Body       types.OmmString
@@ -20,7 +21,7 @@ type OmmHTTPRequest struct {
 	RequestURI types.OmmString
 }
 
-func (r OmmHTTPRequest) FromGoType(req http.Request) {
+func (r *OmmHTTPRequest) FromGoType(req http.Request) {
 
 	var rmethod types.OmmString
 	rmethod.FromGoType(req.Method)

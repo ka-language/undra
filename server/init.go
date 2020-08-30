@@ -17,7 +17,7 @@ func init() {
 		return native.GoatProtoIndex(reflect.ValueOf(&asserted), val2.(types.OmmString), stacktrace, line, file)
 	})
 	goat.DefOp("undra-response", "string", "::", func(val1, val2 types.OmmType, instance *types.Instance, stacktrace []string, line uint64, file string, stacksize uint) *types.OmmType {
-		asserted := val1.(types.OmmString)
+		asserted := val1.(OmmHTTPResponseWriter)
 		return native.GoatProtoIndex(reflect.ValueOf(&asserted), val2.(types.OmmString), stacktrace, line, file)
 	})
 
