@@ -2,6 +2,7 @@ package undra
 
 import (
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -14,35 +15,44 @@ import (
 
 func staticsend(res http.ResponseWriter, req *http.Request) {
 	//otherwise, just render the file with no handling (static)
-	htmfile := "./public" + req.URL.Path
+	htmfile := path.Join("./public", req.URL.Path)
+	http.ServeFile(res, req, htmfile)
+}
 
-	if _, f := os.Stat(htmfile); !os.IsNotExist(f) { //only if it exists
-		http.ServeFile(res, req, htmfile)
-	} else {
-		//otherwise serve the 404 not exists file
-		_404file := "./public" + "notfound.html"
-
-		if _, f := os.Stat(_404file); !os.IsNotExist(f) { //only if it exists
-			http.ServeFile(res, req, _404file)
-		} else {
-			//otherwise just write 404 path not found
-			http.Error(res, "404 path not found", http.StatusNotFound)
-		}
+func getfmt(fpath string) string {
+	file, e := os.Open(path.Join("./public", fpath))
+	if e != nil {
+		return ".oat"
 	}
+	read, e := ioutil.ReadAll(file)
+	if e != nil {
+		return ".oat"
+	}
+
+	if strings.HasPrefix(string(read), "<!--fmt:omm-->") {
+		return ".omm"
+	} else if strings.HasPrefix(string(read), "<!--fmt:klr-->") {
+		return ".klr"
+	}
+
+	return ".oat"
 }
 
 func handle(res http.ResponseWriter, req *http.Request) {
 
-	//remove the extension, and replace it with .oat
-	oatname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + ".oat"
+	//remove the extension, and replace it with .oat (or .omm or .klr)
+	oatname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
 
 	//prepend the server path
 	oatf := path.Join("server", oatname)
 
 	if _, f := os.Stat(oatf); !os.IsNotExist(f) {
 
-		//load the oat file using goat
-		lib, e := goat.LoadLibrary(oatf)
+		var tmp = params
+		tmp.Name = oatname
+
+		//load the oat (or omm or kayl) file using goat
+		lib, e := goat.LoadLibrary(oatf, tmp)
 
 		if e != nil {
 			fmt.Println(e)

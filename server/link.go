@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"unsafe"
+
+	"github.com/omm-lang/omm/lang/types"
 )
 
-//Goatv is the location of the oat shared library (or dynamic library) "CallFunc" function
-var Goatv unsafe.Pointer
+var params types.CliParams
 
 //StartServer starts the undra server in the current working directory
-func StartServer(host string) {
+func StartServer(host string, _params types.CliParams) {
+
+	params = _params
 
 	http.HandleFunc("/", handle)
 

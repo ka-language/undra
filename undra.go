@@ -3,10 +3,15 @@ package main
 import (
 	"os"
 
+	"github.com/omm-lang/omm/lang/types"
 	undra "github.com/omm-lang/undra/server"
 )
 
 func main() {
+
+	basedir, _ := os.Getwd()
+	var params types.CliParams
+	params.OmmDirname = basedir
 
 	dirname, _ := os.Getwd() //get the working directory
 	os.Chdir(dirname)        //and change to it
@@ -22,5 +27,5 @@ func main() {
 		}
 	}
 
-	undra.StartServer(host)
+	undra.StartServer(host, params)
 }
