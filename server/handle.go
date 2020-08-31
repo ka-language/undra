@@ -14,9 +14,20 @@ import (
 )
 
 func staticsend(res http.ResponseWriter, req *http.Request) {
+
 	//otherwise, just render the file with no handling (static)
-	htmfile := path.Join("./public", req.URL.Path)
-	http.ServeFile(res, req, htmfile)
+	htmfile := path.Join("public", req.URL.Path)
+
+	//detect errors
+	if serve_errs(res, req) {
+		return
+	}
+
+	//render static (un-templated) html
+	f, _ := ioutil.ReadFile(htmfile)
+	res.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(res, string(f))
+	///////////////////////////////////
 }
 
 func getfmt(fpath string) string {
@@ -39,6 +50,10 @@ func getfmt(fpath string) string {
 }
 
 func handle(res http.ResponseWriter, req *http.Request) {
+
+	if req.URL.Path == "/" {
+		req.URL.Path = "/index.html"
+	}
 
 	//remove the extension, and replace it with .oat (or .omm or .klr)
 	oatname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
@@ -70,7 +85,6 @@ func handle(res http.ResponseWriter, req *http.Request) {
 		var reqommtype types.OmmType = ommreq
 		var resommtype types.OmmType = ommres
 		goat.CallOatFunc(instance, "handle", &reqommtype, &resommtype)
-
 	} else {
 		staticsend(res, req)
 	}
