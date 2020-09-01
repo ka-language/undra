@@ -3,24 +3,13 @@ package undra
 import (
 	"fmt"
 	"net/http"
+	"path"
 	"time"
 
 	"github.com/omm-lang/omm/lang/interpreter"
 	"github.com/omm-lang/omm/lang/types"
 	"github.com/omm-lang/omm/ommstd/native"
 )
-
-//OmmHTTPResponseWriter represents an http response writer in Omm
-type OmmHTTPResponseWriter struct {
-	Render,
-	Send,
-	SetCookie,
-	ClearCookie,
-	Redirect,
-	Error,
-	Header,
-	Status native.OmmGoFunc
-}
 
 func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 
@@ -35,6 +24,25 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 				var undef types.OmmType = types.OmmUndef{}
 				return &undef
 			} else if len(args) == 1 && (*args[0]).Type() == "hash" {
+
+				var hash = (*args[0]).(types.OmmHash)
+				var template = make(map[string]string)
+
+				for k, v := range hash.Hash {
+					var str = (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.OmmString).ToGoType()
+					template[k] = str
+
+					templated, e := templatedoc(path.Join("public", req.URL.Path), template)
+
+					if e != nil {
+						native.OmmPanic("File "+req.URL.Path+" does not exist in the public directory", line, file, stacktrace)
+					}
+
+					res.Header().Set("Content-Type", "text/html")
+					fmt.Fprint(res, templated)
+					res.Header().Set("Content-Type", "text/plain")
+				}
+
 				var undef types.OmmType = types.OmmUndef{}
 				return &undef
 			}

@@ -21,6 +21,7 @@ func staticsend(res http.ResponseWriter, req *http.Request) {
 	f, _ := ioutil.ReadFile(htmfile)
 	res.Header().Set("Content-Type", "text/html")
 	fmt.Fprint(res, string(f))
+	res.Header().Set("Content-Type", "text/plain")
 	///////////////////////////////////
 }
 
