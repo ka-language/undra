@@ -1,25 +1,26 @@
 package undra
 
 import (
-	"reflect"
+	"os"
+	"path/filepath"
 
 	"github.com/omm-lang/goat"
 	"github.com/omm-lang/omm/lang/types"
-	"github.com/omm-lang/omm/stdlib/native"
+)
+
+var (
+	requestProto  types.OmmProto
+	responseProto types.OmmProto
 )
 
 func init() {
+	//get the request and response protos from undrastd/
 
-	//define the operations to access go struct fields in omm
+	ex, _ := os.Executable()
+	os.Chdir(filepath.Dir(ex))
 
-	goat.DefOp("undra-request", "string", "::", func(val1, val2 types.OmmType, instance *types.Instance, stacktrace []string, line uint64, file string, stacksize uint) *types.OmmType {
-		asserted := val1.(OmmHTTPRequest)
-		return native.GoatProtoIndex(reflect.ValueOf(&asserted), val2.(types.OmmString), stacktrace, line, file)
-	})
-	goat.DefOp("undra-response", "string", "::", func(val1, val2 types.OmmType, instance *types.Instance, stacktrace []string, line uint64, file string, stacksize uint) *types.OmmType {
-		asserted := val1.(OmmHTTPResponseWriter)
-		return native.GoatProtoIndex(reflect.ValueOf(&asserted), val2.(types.OmmString), stacktrace, line, file)
-	})
+	lib, _ := goat.LoadLibrary("undrastd/undra.omm", types.CliParams{})
 
-	/////////////////////////////////////////////////////////
+	requestProto = (*lib.Fetch("$undra_request").Value).(types.OmmProto)
+	responseProto = (*lib.Fetch("$undra_response").Value).(types.OmmProto)
 }

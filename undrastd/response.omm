@@ -1,0 +1,11 @@
+var undra_response = proto {
+    ; fill this in go (using gofuncs)
+    var render
+    var send
+    var setcookie
+    var clearcookie
+    var redirect
+    var error
+    var header
+    var status
+}

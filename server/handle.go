@@ -10,18 +10,12 @@ import (
 	"strings"
 
 	"github.com/omm-lang/goat"
-	"github.com/omm-lang/omm/lang/types"
 )
 
 func staticsend(res http.ResponseWriter, req *http.Request) {
 
 	//otherwise, just render the file with no handling (static)
 	htmfile := path.Join("public", req.URL.Path)
-
-	//detect errors
-	if serve_errs(res, req) {
-		return
-	}
 
 	//render static (un-templated) html
 	f, _ := ioutil.ReadFile(htmfile)
@@ -31,6 +25,7 @@ func staticsend(res http.ResponseWriter, req *http.Request) {
 }
 
 func getfmt(fpath string) string {
+
 	file, e := os.Open(path.Join("./public", fpath))
 	if e != nil {
 		return ".oat"
@@ -74,17 +69,15 @@ func handle(res http.ResponseWriter, req *http.Request) {
 			os.Exit(1)
 		}
 
-		var instance = goat.NewInstance(lib)
+		var ommreq = createRequest(*req)
+		var ommres = createResponse(res, req)
 
-		var ommreq OmmHTTPRequest
-		ommreq.FromGoType(*req)
+		_, e = goat.CallOatFunc(lib, "handle", ommreq, ommres)
 
-		var ommres OmmHTTPResponseWriter
-		ommres.FromGoType(res, req)
-
-		var reqommtype types.OmmType = ommreq
-		var resommtype types.OmmType = ommres
-		goat.CallOatFunc(instance, "handle", &reqommtype, &resommtype)
+		if e != nil {
+			fmt.Println(e)
+			os.Exit(1)
+		}
 	} else {
 		staticsend(res, req)
 	}

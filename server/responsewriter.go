@@ -7,7 +7,7 @@ import (
 
 	"github.com/omm-lang/omm/lang/interpreter"
 	"github.com/omm-lang/omm/lang/types"
-	"github.com/omm-lang/omm/stdlib/native"
+	"github.com/omm-lang/omm/ommstd/native"
 )
 
 //OmmHTTPResponseWriter represents an http response writer in Omm
@@ -22,8 +22,12 @@ type OmmHTTPResponseWriter struct {
 	Status native.OmmGoFunc
 }
 
-func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Request) {
-	r.Render = native.OmmGoFunc{
+func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
+
+	var response = responseProto.New(types.Instance{})
+
+	wrender, _ := response.Get("render", "")
+	*wrender = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			if len(args) == 0 {
@@ -42,7 +46,8 @@ func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Re
 		},
 	}
 
-	r.Send = native.OmmGoFunc{
+	wsend, _ := response.Get("send", "")
+	*wsend = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			for _, v := range args {
@@ -55,7 +60,8 @@ func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Re
 		},
 	}
 
-	r.SetCookie = native.OmmGoFunc{
+	wsetcookie, _ := response.Get("setcookie", "")
+	*wsetcookie = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			invalidsig := "Function undra-response::SetCookie requires the parameter signature: (string, hash)"
@@ -137,7 +143,8 @@ func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Re
 		},
 	}
 
-	r.ClearCookie = native.OmmGoFunc{
+	wclearcookie, _ := response.Get("clearcookie", "")
+	*wclearcookie = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			if len(args) != 1 || (*args[0]).Type() != "string" {
@@ -156,7 +163,8 @@ func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Re
 		},
 	}
 
-	r.Redirect = native.OmmGoFunc{
+	wredirect, _ := response.Get("redirect", "")
+	*wredirect = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 			if len(args) != 1 || (*args[0]).Type() != "string" {
 				native.OmmPanic("Function undra-response::Redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
@@ -170,7 +178,8 @@ func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Re
 		},
 	}
 
-	r.Error = native.OmmGoFunc{
+	werror, _ := response.Get("error", "")
+	*werror = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "number" {
@@ -187,18 +196,6 @@ func (r *OmmHTTPResponseWriter) FromGoType(res http.ResponseWriter, req *http.Re
 		},
 	}
 
+	var ommtype types.OmmType = response
+	return &ommtype
 }
-
-func (r OmmHTTPResponseWriter) Format() string {
-	return "{ undra-response }"
-}
-
-func (r OmmHTTPResponseWriter) Type() string {
-	return "undra-response"
-}
-
-func (r OmmHTTPResponseWriter) TypeOf() string {
-	return r.Type()
-}
-
-func (_ OmmHTTPResponseWriter) Deallocate() {}

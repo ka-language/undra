@@ -1,0 +1,12 @@
+var undra_request = proto {
+    ; fill this in go (using gofuncs)
+    var method = 1
+    var url
+    var protocol
+    var header
+    var body
+    var host
+    var form
+    var remoteaddr
+    var requesturi
+}
