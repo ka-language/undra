@@ -47,7 +47,7 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 				return &undef
 			}
 
-			native.OmmPanic("Function undra-response::Render requires an argument count of 0 or 1 where the first argument is of type hash", line, file, stacktrace)
+			native.OmmPanic("Function undra-response::render requires an argument count of 0 or 1 where the first argument is of type hash", line, file, stacktrace)
 
 			var undef types.OmmType = types.OmmUndef{}
 			return &undef
@@ -72,7 +72,7 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 	*wsetcookie = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
-			invalidsig := "Function undra-response::SetCookie requires the parameter signature: (string, hash)"
+			invalidsig := "Function undra-response::setcookie requires the parameter signature: (string, hash)"
 
 			if len(args) != 2 {
 				native.OmmPanic(invalidsig, line, file, stacktrace)
@@ -156,7 +156,7 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			if len(args) != 1 || (*args[0]).Type() != "string" {
-				native.OmmPanic("Function undra-response::ClearCookie requires a argument count of 1 with the type of string", line, file, stacktrace)
+				native.OmmPanic("Function undra-response::clearcookie requires a argument count of 1 with the type of string", line, file, stacktrace)
 			}
 
 			var name = (*args[0]).(types.OmmString).ToGoType()
@@ -175,7 +175,7 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 	*wredirect = native.OmmGoFunc{
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 			if len(args) != 1 || (*args[0]).Type() != "string" {
-				native.OmmPanic("Function undra-response::Redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
+				native.OmmPanic("Function undra-response::redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
 			}
 
 			nurl := (*args[0]).(types.OmmString).ToGoType()
@@ -191,13 +191,33 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
 
 			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "number" {
-				native.OmmPanic("Function undra-response::Error requires the parameter signature: (string, number)", line, file, stacktrace)
+				native.OmmPanic("Function undra-response::error requires the parameter signature: (string, number)", line, file, stacktrace)
 			}
 
 			msg := (*args[0]).(types.OmmString).ToGoType()
 			err := int((*args[1]).(types.OmmNumber).ToGoType())
 
 			http.Error(res, msg, err)
+
+			var undef types.OmmType = types.OmmUndef{}
+			return &undef
+		},
+	}
+
+	wheader, _ := response.Get("header", "")
+	*wheader = native.OmmGoFunc{
+		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+
+			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "string" {
+				native.OmmPanic("Function undra-response::header requires the parameter signature: (string, string)", line, file, stacktrace)
+			}
+
+			//get the name and value as go strings
+			name := (*args[0]).(types.OmmString).ToGoType()
+			value := (*args[1]).(types.OmmString).ToGoType()
+			//////////////////////////////////////
+
+			res.Header().Set(name, value) //set the header
 
 			var undef types.OmmType = types.OmmUndef{}
 			return &undef
