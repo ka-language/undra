@@ -9,8 +9,8 @@ import (
 	undra "github.com/omm-lang/undra/server"
 )
 
-var cwd = flag.String("cwd", "", "set the current working directory (automatically placed by the shell/pwsh script)")
-var host = flag.String("host", "localhost:80", "set ")
+var cwd = flag.String("cwd", "", "Set the current working directory (automatically placed by the shell/pwsh script)")
+var host = flag.String("host", "localhost:80", "Set the host:port of the undra instance")
 
 func init() {
 	flag.Usage = suite.Usagef("Undra")
