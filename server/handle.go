@@ -51,6 +51,13 @@ func handle(res http.ResponseWriter, req *http.Request) {
 		req.URL.Path = "/index.html"
 	}
 
+	//if the request is not for html
+	if filepath.Ext(req.URL.Path) != ".html" {
+		fmt.Println(req.URL.Path)
+		http.ServeFile(res, req, path.Join("public", req.URL.Path))
+		return
+	}
+
 	//remove the extension, and replace it with .oat (or .omm or .klr)
 	oatname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
 
