@@ -9,7 +9,6 @@ import (
 	undra "github.com/omm-lang/undra/server"
 )
 
-var cwd = flag.String("cwd", "", "Set the current working directory (automatically placed by the shell/pwsh script)")
 var host = flag.String("host", "localhost:80", "Set the host:port of the undra instance")
 
 func init() {
@@ -22,8 +21,6 @@ func main() {
 	basedir, _ := os.Executable()
 	var params types.CliParams
 	params.OmmDirname = basedir
-
-	os.Chdir(*cwd) //change to the cwd
 
 	undra.StartServer(*host, params)
 }
