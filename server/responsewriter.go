@@ -8,7 +8,7 @@ import (
 
 	"github.com/omm-lang/omm/lang/interpreter"
 	"github.com/omm-lang/omm/lang/types"
-	"github.com/omm-lang/omm/ommstd/native"
+	"github.com/omm-lang/omm/native"
 )
 
 func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
