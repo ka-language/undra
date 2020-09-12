@@ -1,2 +1,0 @@
-include ("request.omm")
-include ("response.omm")

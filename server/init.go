@@ -3,9 +3,10 @@ package undra
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 
-	"github.com/omm-lang/goat"
-	"github.com/omm-lang/omm/lang/types"
+	"goat"
+	"omm/lang/types"
 )
 
 var (
@@ -16,10 +17,11 @@ var (
 func init() {
 	//get the request and response protos from undrastd/
 
-	ex, _ := os.Executable()
+	_, ex, _, _ := runtime.Caller(0)
 	os.Chdir(filepath.Dir(ex))
+	os.Chdir("..")
 
-	lib, _ := goat.LoadLibrary("undrastd/undra.omm", types.CliParams{})
+	lib, _ := goat.LoadLibrary("undrastd", types.CliParams{})
 
 	requestProto = (*lib.Fetch("$undra_request").Value).(types.OmmProto)
 	responseProto = (*lib.Fetch("$undra_response").Value).(types.OmmProto)

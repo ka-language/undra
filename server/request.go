@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/omm-lang/omm/lang/types"
+	"omm/lang/types"
 )
 
 func createRequest(req http.Request) *types.OmmType {

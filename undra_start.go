@@ -4,9 +4,9 @@ import (
 	"flag"
 	"os"
 
-	suite "github.com/omm-lang/omm-suite"
-	"github.com/omm-lang/omm/lang/types"
-	undra "github.com/omm-lang/undra/server"
+	suite "omm-suite"
+	"omm/lang/types"
+	undra "undra/server"
 )
 
 var host = flag.String("host", "localhost:80", "Set the host:port of the undra instance")

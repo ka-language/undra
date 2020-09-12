@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/omm-lang/goat"
+	"goat"
 )
 
 func staticsend(res http.ResponseWriter, req *http.Request) {

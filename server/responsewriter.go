@@ -6,9 +6,9 @@ import (
 	"path"
 	"time"
 
-	"github.com/omm-lang/omm/lang/interpreter"
-	"github.com/omm-lang/omm/lang/types"
-	"github.com/omm-lang/omm/native"
+	"omm/lang/interpreter"
+	"omm/lang/types"
+	"omm/native"
 )
 
 func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/omm-lang/omm/lang/types"
+	"omm/lang/types"
 )
 
 var params types.CliParams
