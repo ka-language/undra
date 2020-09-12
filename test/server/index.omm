@@ -1,6 +1,0 @@
-var handle = fn(req, res) {
-    log req::url
-    res::render([:
-        ".a" = "jghgjhgjhjghgjhghgj"
-    :])
-}
