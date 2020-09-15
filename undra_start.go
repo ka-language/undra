@@ -20,7 +20,7 @@ func main() {
 
 	basedir, _ := os.Executable()
 	var params types.CliParams
-	params.OmmDirname = basedir
+	params.KaDirname = basedir
 
 	undra.StartServer(*host, params)
 }

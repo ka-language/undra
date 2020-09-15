@@ -1,17 +1,17 @@
 package undra
 
 import (
+	"goat"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"goat"
-	"omm/lang/types"
+	"ka/lang/types"
 )
 
 var (
-	requestProto  types.OmmProto
-	responseProto types.OmmProto
+	requestProto  types.KaProto
+	responseProto types.KaProto
 )
 
 func init() {
@@ -23,6 +23,6 @@ func init() {
 
 	lib, _ := goat.LoadLibrary("undrastd", types.CliParams{})
 
-	requestProto = (*lib.Fetch("$undra_request").Value).(types.OmmProto)
-	responseProto = (*lib.Fetch("$undra_response").Value).(types.OmmProto)
+	requestProto = (*lib.Fetch("$undra_request").Value).(types.KaProto)
+	responseProto = (*lib.Fetch("$undra_response").Value).(types.KaProto)
 }

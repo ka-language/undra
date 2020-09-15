@@ -29,20 +29,20 @@ func getfmt(fpath string) string {
 
 	file, e := os.Open(path.Join("./public", fpath))
 	if e != nil {
-		return ".oat"
+		return ".kast"
 	}
 	read, e := ioutil.ReadAll(file)
 	if e != nil {
-		return ".oat"
+		return ".kast"
 	}
 
-	if strings.HasPrefix(string(read), "<!--fmt:omm-->") {
-		return ".omm"
+	if strings.HasPrefix(string(read), "<!--fmt:kal-->") {
+		return ".kal"
 	} else if strings.HasPrefix(string(read), "<!--fmt:klr-->") {
 		return ".klr"
 	}
 
-	return ".oat"
+	return ".kast"
 }
 
 func handle(res http.ResponseWriter, req *http.Request) {
@@ -58,29 +58,29 @@ func handle(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//remove the extension, and replace it with .oat (or .omm or .klr)
-	oatname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
+	//remove the extension, and replace it with .kast (or .ka or .klr)
+	kastname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
 
 	//prepend the server path
-	oatf := path.Join("server", oatname)
+	kastf := path.Join("server", kastname)
 
-	if _, f := os.Stat(oatf); !os.IsNotExist(f) {
+	if _, f := os.Stat(kastf); !os.IsNotExist(f) {
 
 		var tmp = params
-		tmp.Name = oatname
+		tmp.Name = kastname
 
-		//load the oat (or omm or kayl) file using goat
-		lib, e := goat.LoadLibrary(oatf, tmp)
+		//load the kast (or ka or kayl) file using goat
+		lib, e := goat.LoadLibrary(kastf, tmp)
 
 		if e != nil {
 			fmt.Println(e)
 			os.Exit(1)
 		}
 
-		var ommreq = createRequest(*req)
-		var ommres = createResponse(res, req)
+		var kareq = createRequest(*req)
+		var kares = createResponse(res, req)
 
-		_, e = goat.CallOatFunc(lib, "handle", ommreq, ommres)
+		_, e = goat.CallOatFunc(lib, "handle", kareq, kares)
 
 		if e != nil {
 			fmt.Println(e)

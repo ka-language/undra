@@ -6,36 +6,35 @@ import (
 	"path"
 	"time"
 
-	"omm/lang/interpreter"
-	"omm/lang/types"
-	"omm/native"
+	"ka/lang/interpreter"
+	"ka/lang/types"
 )
 
-func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
+func createResponse(res http.ResponseWriter, req *http.Request) *types.KaType {
 
 	var response = responseProto.New(types.Instance{})
 
 	wrender, _ := response.Get("render", "")
-	*wrender = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*wrender = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 
 			if len(args) == 0 {
 				staticsend(res, req)
-				var undef types.OmmType = types.OmmUndef{}
+				var undef types.KaType = types.KaUndef{}
 				return &undef
 			} else if len(args) == 1 && (*args[0]).Type() == "hash" {
 
-				var hash = (*args[0]).(types.OmmHash)
+				var hash = (*args[0]).(types.KaHash)
 				var template = make(map[string]string)
 
 				for k, v := range hash.Hash {
-					var str = (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.OmmString).ToGoType()
+					var str = (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.KaString).ToGoType()
 					template[k] = str
 
 					templated, e := templatedoc(path.Join("public", req.URL.Path), template)
 
 					if e != nil {
-						native.OmmPanic("File "+req.URL.Path+" does not exist in the public directory", line, file, stacktrace)
+						interpreter.KaPanic("File "+req.URL.Path+" does not exist in the public directory", line, file, stacktrace)
 					}
 
 					res.Header().Set("Content-Type", "text/html")
@@ -43,187 +42,187 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.OmmType {
 					res.Header().Set("Content-Type", "text/plain")
 				}
 
-				var undef types.OmmType = types.OmmUndef{}
+				var undef types.KaType = types.KaUndef{}
 				return &undef
 			}
 
-			native.OmmPanic("Function undra-response::render requires an argument count of 0 or 1 where the first argument is of type hash", line, file, stacktrace)
+			interpreter.KaPanic("Function undra-response::render requires an argument count of 0 or 1 where the first argument is of type hash", line, file, stacktrace)
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
 	wsend, _ := response.Get("send", "")
-	*wsend = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*wsend = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 
 			for _, v := range args {
-				strval := (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.OmmString).ToGoType()
+				strval := (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.KaString).ToGoType()
 				fmt.Fprintf(res, "%s", strval)
 			}
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
 	wsetcookie, _ := response.Get("setcookie", "")
-	*wsetcookie = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*wsetcookie = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 
 			invalidsig := "Function undra-response::setcookie requires the parameter signature: (string, hash)"
 
 			if len(args) != 2 {
-				native.OmmPanic(invalidsig, line, file, stacktrace)
+				interpreter.KaPanic(invalidsig, line, file, stacktrace)
 			}
 
 			if (*args[0]).Type() != "string" || (*args[1]).Type() != "hash" {
-				native.OmmPanic(invalidsig, line, file, stacktrace)
+				interpreter.KaPanic(invalidsig, line, file, stacktrace)
 			}
 
 			var gocookie http.Cookie
-			var ommhash = (*args[1]).(types.OmmHash)
-			gocookie.Name = (*args[0]).(types.OmmString).ToGoType()
+			var kahash = (*args[1]).(types.KaHash)
+			gocookie.Name = (*args[0]).(types.KaString).ToGoType()
 
-			var testtype = func(ommv *types.OmmType, typeof, fieldname string) bool {
+			var testtype = func(kav *types.KaType, typeof, fieldname string) bool {
 
-				if ommv == nil || (*ommv).Type() == "undef" {
+				if kav == nil || (*kav).Type() == "undef" {
 					return false
 				}
 
-				if (*ommv).Type() != typeof {
-					native.OmmPanic("Expected type "+typeof+" for field "+fieldname+" in an undra-response", line, file, stacktrace)
+				if (*kav).Type() != typeof {
+					interpreter.KaPanic("Expected type "+typeof+" for field "+fieldname+" in an undra-response", line, file, stacktrace)
 				}
 
 				return true
 			}
 
 			//set all of the fields
-			var oval *types.OmmType
+			var oval *types.KaType
 
-			oval = ommhash.At("value")
+			oval = kahash.At("value")
 			if testtype(oval, "string", "value") {
-				gocookie.Value = (*oval).(types.OmmString).ToGoType()
+				gocookie.Value = (*oval).(types.KaString).ToGoType()
 			}
 
-			oval = ommhash.At("path")
+			oval = kahash.At("path")
 			if testtype(oval, "string", "path") {
-				gocookie.Path = (*oval).(types.OmmString).ToGoType()
+				gocookie.Path = (*oval).(types.KaString).ToGoType()
 			}
 
-			oval = ommhash.At("domain")
+			oval = kahash.At("domain")
 			if testtype(oval, "string", "domain") {
-				gocookie.Domain = (*oval).(types.OmmString).ToGoType()
+				gocookie.Domain = (*oval).(types.KaString).ToGoType()
 			}
 
-			oval = ommhash.At("expires")
+			oval = kahash.At("expires")
 			if testtype(oval, "string", "number") {
-				gocookie.Expires = time.Now()                                             //set the expires to now
-				gocookie.Expires.Add(time.Duration((*oval).(types.OmmNumber).ToGoType())) //and add to it
+				gocookie.Expires = time.Now()                                            //set the expires to now
+				gocookie.Expires.Add(time.Duration((*oval).(types.KaNumber).ToGoType())) //and add to it
 			}
 
-			oval = ommhash.At("maxage")
+			oval = kahash.At("maxage")
 			if testtype(oval, "string", "number") {
-				gocookie.MaxAge = int((*oval).(types.OmmNumber).ToGoType())
+				gocookie.MaxAge = int((*oval).(types.KaNumber).ToGoType())
 			}
 
-			oval = ommhash.At("secure")
+			oval = kahash.At("secure")
 			if testtype(oval, "string", "bool") {
-				gocookie.Secure = (*oval).(types.OmmBool).ToGoType()
+				gocookie.Secure = (*oval).(types.KaBool).ToGoType()
 			}
 
-			oval = ommhash.At("httponly")
+			oval = kahash.At("httponly")
 			if testtype(oval, "string", "httponly") {
-				gocookie.HttpOnly = (*oval).(types.OmmBool).ToGoType()
+				gocookie.HttpOnly = (*oval).(types.KaBool).ToGoType()
 			}
 
-			oval = ommhash.At("samesite")
+			oval = kahash.At("samesite")
 			if testtype(oval, "string", "number") {
-				gocookie.SameSite = http.SameSite((*oval).(types.OmmNumber).ToGoType())
+				gocookie.SameSite = http.SameSite((*oval).(types.KaNumber).ToGoType())
 			}
 			///////////////////////
 
 			http.SetCookie(res, &gocookie)
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
 	wclearcookie, _ := response.Get("clearcookie", "")
-	*wclearcookie = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*wclearcookie = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 
 			if len(args) != 1 || (*args[0]).Type() != "string" {
-				native.OmmPanic("Function undra-response::clearcookie requires a argument count of 1 with the type of string", line, file, stacktrace)
+				interpreter.KaPanic("Function undra-response::clearcookie requires a argument count of 1 with the type of string", line, file, stacktrace)
 			}
 
-			var name = (*args[0]).(types.OmmString).ToGoType()
+			var name = (*args[0]).(types.KaString).ToGoType()
 			http.SetCookie(res, &http.Cookie{ //set the expires to 1970, Jan 1 (unix epoch)
 				Name:    name,
 				Value:   "",
 				Expires: time.Unix(0, 0),
 			})
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
 	wredirect, _ := response.Get("redirect", "")
-	*wredirect = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*wredirect = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 			if len(args) != 1 || (*args[0]).Type() != "string" {
-				native.OmmPanic("Function undra-response::redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
+				interpreter.KaPanic("Function undra-response::redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
 			}
 
-			nurl := (*args[0]).(types.OmmString).ToGoType()
+			nurl := (*args[0]).(types.KaString).ToGoType()
 			http.Redirect(res, req, nurl, http.StatusSeeOther)
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
 	werror, _ := response.Get("error", "")
-	*werror = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*werror = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 
 			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "number" {
-				native.OmmPanic("Function undra-response::error requires the parameter signature: (string, number)", line, file, stacktrace)
+				interpreter.KaPanic("Function undra-response::error requires the parameter signature: (string, number)", line, file, stacktrace)
 			}
 
-			msg := (*args[0]).(types.OmmString).ToGoType()
-			err := int((*args[1]).(types.OmmNumber).ToGoType())
+			msg := (*args[0]).(types.KaString).ToGoType()
+			err := int((*args[1]).(types.KaNumber).ToGoType())
 
 			http.Error(res, msg, err)
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
 	wheader, _ := response.Get("header", "")
-	*wheader = native.OmmGoFunc{
-		Function: func(args []*types.OmmType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.OmmType {
+	*wheader = interpreter.KaGoFunc{
+		Function: func(args []*types.KaType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.KaType {
 
 			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "string" {
-				native.OmmPanic("Function undra-response::header requires the parameter signature: (string, string)", line, file, stacktrace)
+				interpreter.KaPanic("Function undra-response::header requires the parameter signature: (string, string)", line, file, stacktrace)
 			}
 
 			//get the name and value as go strings
-			name := (*args[0]).(types.OmmString).ToGoType()
-			value := (*args[1]).(types.OmmString).ToGoType()
+			name := (*args[0]).(types.KaString).ToGoType()
+			value := (*args[1]).(types.KaString).ToGoType()
 			//////////////////////////////////////
 
 			res.Header().Set(name, value) //set the header
 
-			var undef types.OmmType = types.OmmUndef{}
+			var undef types.KaType = types.KaUndef{}
 			return &undef
 		},
 	}
 
-	var ommtype types.OmmType = response
-	return &ommtype
+	var katype types.KaType = response
+	return &katype
 }
