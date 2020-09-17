@@ -6,12 +6,12 @@ import (
 	"path/filepath"
 	"runtime"
 
-	"ka/lang/types"
+	"tusk/lang/types"
 )
 
 var (
-	requestProto  types.KaProto
-	responseProto types.KaProto
+	requestProto  types.TuskProto
+	responseProto types.TuskProto
 )
 
 func init() {
@@ -23,6 +23,6 @@ func init() {
 
 	lib, _ := goat.LoadLibrary("undrastd", types.CliParams{})
 
-	requestProto = (*lib.Fetch("$undra_request").Value).(types.KaProto)
-	responseProto = (*lib.Fetch("$undra_response").Value).(types.KaProto)
+	requestProto = (*lib.Fetch("$undra_request").Value).(types.TuskProto)
+	responseProto = (*lib.Fetch("$undra_response").Value).(types.TuskProto)
 }

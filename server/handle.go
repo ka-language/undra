@@ -29,11 +29,11 @@ func getfmt(fpath string) string {
 
 	file, e := os.Open(path.Join("./public", fpath))
 	if e != nil {
-		return ".kast"
+		return ".oat"
 	}
 	read, e := ioutil.ReadAll(file)
 	if e != nil {
-		return ".kast"
+		return ".oat"
 	}
 
 	if strings.HasPrefix(string(read), "<!--fmt:kal-->") {
@@ -42,7 +42,7 @@ func getfmt(fpath string) string {
 		return ".klr"
 	}
 
-	return ".kast"
+	return ".oat"
 }
 
 func handle(res http.ResponseWriter, req *http.Request) {
@@ -58,7 +58,7 @@ func handle(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//remove the extension, and replace it with .kast (or .ka or .klr)
+	//remove the extension, and replace it with .oat (or .tusk or .klr)
 	kastname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
 
 	//prepend the server path
@@ -69,7 +69,7 @@ func handle(res http.ResponseWriter, req *http.Request) {
 		var tmp = params
 		tmp.Name = kastname
 
-		//load the kast (or ka or kayl) file using goat
+		//load the oat (or tusk or kayl) file using goat
 		lib, e := goat.LoadLibrary(kastf, tmp)
 
 		if e != nil {
