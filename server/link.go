@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"tusk/lang/types"
+	"github.com/tusklang/tusk/lang/types"
 )
 
 var params types.CliParams

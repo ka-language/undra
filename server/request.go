@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"tusk/lang/types"
+	"github.com/tusklang/tusk/lang/types"
 )
 
 func createRequest(req http.Request) *types.TuskType {

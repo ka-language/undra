@@ -1,12 +1,13 @@
 package undra
 
 import (
-	"goat"
 	"os"
 	"path/filepath"
 	"runtime"
 
-	"tusk/lang/types"
+	"github.com/tusklang/goat"
+
+	"github.com/tusklang/tusk/lang/types"
 )
 
 var (

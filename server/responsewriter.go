@@ -6,8 +6,8 @@ import (
 	"path"
 	"time"
 
-	"tusk/lang/interpreter"
-	"tusk/lang/types"
+	"github.com/tusklang/tusk/lang/interpreter"
+	"github.com/tusklang/tusk/lang/types"
 )
 
 func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType {

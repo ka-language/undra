@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"goat"
+	"github.com/tusklang/goat"
 )
 
 func staticsend(res http.ResponseWriter, req *http.Request) {

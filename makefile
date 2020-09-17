@@ -1,16 +1,16 @@
 ifeq ($(OS),Windows_NT)
-	BINARY = undra_start.exe
+	BINARY = undrastart.exe
 	CLEAN_CMD = del
 else
-	BINARY = undra_start
+	BINARY = undrastart
 	CLEAN_CMD = rm -f
 endif
 
-GOPATH = $(CURDIR)/../../
+GOPATH = $(CURDIR)/../../../../
 
 .PHONY: all
 all:
-	go build undra_start.go
+	go build undrastart.go
 
 .PHONY: clean
 clean:
