@@ -9,9 +9,14 @@ endif
 GOPATH = $(CURDIR)/../../../../
 
 .PHONY: all
-all:
+all: go.mod
+	go get -u
 	go build undrastart.go
+
+go.mod:
+	go mod init
 
 .PHONY: clean
 clean:
-	$(CLEAN_CMD) $(BINARY)
+	-go mod tidy
+	-$(CLEAN_CMD) $(BINARY)
