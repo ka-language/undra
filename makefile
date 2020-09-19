@@ -8,6 +8,9 @@ endif
 
 GOPATH = $(CURDIR)/../../../../
 
+.PHONY: default
+default: all
+
 .PHONY: all
 all:
 	go build undrastart.go
