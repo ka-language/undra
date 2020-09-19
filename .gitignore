@@ -1,5 +1,5 @@
-/undra_start.exe
-/undra_start
+/undrastart
+*.exe
 *.oat
 *.dll
 *.so
