@@ -28,8 +28,9 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 				var template = make(map[string]string)
 
 				for k, v := range hash.Hash {
-					var str = (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.TuskString).ToGoType()
-					template[k] = str
+					var strk = (*interpreter.Cast(*k, "string", stacktrace, line, file)).(types.TuskString).ToGoType()
+					var strv = (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.TuskString).ToGoType()
+					template[strk] = strv
 
 					templated, e := templatedoc(path.Join("public", req.URL.Path), template)
 
@@ -99,47 +100,47 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			}
 
 			//set all of the fields
-			var oval *types.TuskType
+			var tval *types.TuskType
 
-			oval = kahash.At("value")
-			if testtype(oval, "string", "value") {
-				gocookie.Value = (*oval).(types.TuskString).ToGoType()
+			tval = kahash.AtStr("value")
+			if testtype(tval, "string", "value") {
+				gocookie.Value = (*tval).(types.TuskString).ToGoType()
 			}
 
-			oval = kahash.At("path")
-			if testtype(oval, "string", "path") {
-				gocookie.Path = (*oval).(types.TuskString).ToGoType()
+			tval = kahash.AtStr("path")
+			if testtype(tval, "string", "path") {
+				gocookie.Path = (*tval).(types.TuskString).ToGoType()
 			}
 
-			oval = kahash.At("domain")
-			if testtype(oval, "string", "domain") {
-				gocookie.Domain = (*oval).(types.TuskString).ToGoType()
+			tval = kahash.AtStr("domain")
+			if testtype(tval, "string", "domain") {
+				gocookie.Domain = (*tval).(types.TuskString).ToGoType()
 			}
 
-			oval = kahash.At("expires")
-			if testtype(oval, "string", "number") {
-				gocookie.Expires = time.Now()                                            //set the expires to now
-				gocookie.Expires.Add(time.Duration((*oval).(types.TuskNumber).ToGoType())) //and add to it
+			tval = kahash.AtStr("expires")
+			if testtype(tval, "string", "number") {
+				gocookie.Expires = time.Now()                                              //set the expires to now
+				gocookie.Expires.Add(time.Duration((*tval).(types.TuskNumber).ToGoType())) //and add to it
 			}
 
-			oval = kahash.At("maxage")
-			if testtype(oval, "string", "number") {
-				gocookie.MaxAge = int((*oval).(types.TuskNumber).ToGoType())
+			tval = kahash.AtStr("maxage")
+			if testtype(tval, "string", "number") {
+				gocookie.MaxAge = int((*tval).(types.TuskNumber).ToGoType())
 			}
 
-			oval = kahash.At("secure")
-			if testtype(oval, "string", "bool") {
-				gocookie.Secure = (*oval).(types.TuskBool).ToGoType()
+			tval = kahash.AtStr("secure")
+			if testtype(tval, "string", "bool") {
+				gocookie.Secure = (*tval).(types.TuskBool).ToGoType()
 			}
 
-			oval = kahash.At("httponly")
-			if testtype(oval, "string", "httponly") {
-				gocookie.HttpOnly = (*oval).(types.TuskBool).ToGoType()
+			tval = kahash.AtStr("httponly")
+			if testtype(tval, "string", "httponly") {
+				gocookie.HttpOnly = (*tval).(types.TuskBool).ToGoType()
 			}
 
-			oval = kahash.At("samesite")
-			if testtype(oval, "string", "number") {
-				gocookie.SameSite = http.SameSite((*oval).(types.TuskNumber).ToGoType())
+			tval = kahash.AtStr("samesite")
+			if testtype(tval, "string", "number") {
+				gocookie.SameSite = http.SameSite((*tval).(types.TuskNumber).ToGoType())
 			}
 			///////////////////////
 
