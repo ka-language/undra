@@ -1,4 +1,4 @@
-/undrastart
+*.out
 *.exe
 *.oat
 *.dll

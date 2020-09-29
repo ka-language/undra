@@ -2,7 +2,7 @@ ifeq ($(OS),Windows_NT)
 	BINARY = undrastart.exe
 	CLEAN_CMD = del
 else
-	BINARY = undrastart
+	BINARY = undrastart.out
 	CLEAN_CMD = rm -f
 endif
 
@@ -13,7 +13,7 @@ default: all
 
 .PHONY: all
 all:
-	go build undrastart.go
+	go build -o $(BINARY) undrastart.go
 
 .PHONY: clean
 clean:
