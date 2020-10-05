@@ -1,2 +1,3 @@
-#!/bin/sh
-$(dirname "$0")/undrastart.out "$args" -cwd "$PWD"
+#!/bin/bash
+cd "$PWD"
+$(dirname "$0")/undrastart.out "$args"
