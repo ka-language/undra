@@ -80,9 +80,9 @@ func handle(res http.ResponseWriter, req *http.Request) {
 		var kareq = createRequest(*req)
 		var kares = createResponse(res, req)
 
-		_, e = goat.CallOatFunc(lib, "handle", kareq, kares)
+		_, err := goat.CallOatFunc(lib, "handle", kareq, kares)
 
-		if e != nil {
+		if err != nil {
 			fmt.Println(e)
 			os.Exit(1)
 		}

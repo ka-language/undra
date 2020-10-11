@@ -17,12 +17,12 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 
 	wrender, _ := response.Get("render", "")
 	*wrender = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 
 			if len(args) == 0 {
 				staticsend(res, req)
 				var undef types.TuskType = types.TuskUndef{}
-				return &undef
+				return &undef, nil
 			} else if len(args) == 1 && (*args[0]).Type() == "hash" {
 
 				var hash = (*args[0]).(types.TuskHash)
@@ -45,19 +45,16 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 				}
 
 				var undef types.TuskType = types.TuskUndef{}
-				return &undef
+				return &undef, nil
 			}
 
-			native.TuskPanic("Function undra-response::render requires an argument count of 0 or 1 where the first argument is of type hash", line, file, stacktrace)
-
-			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return nil, native.TuskPanic("Function undra-response::render requires an argument count of 0 or 1 where the first argument is of type hash", line, file, stacktrace)
 		},
 	}
 
 	wsend, _ := response.Get("send", "")
 	*wsend = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 
 			for _, v := range args {
 				strval := (*interpreter.Cast(*v, "string", stacktrace, line, file)).(types.TuskString).ToGoType()
@@ -65,13 +62,13 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			}
 
 			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return &undef, nil
 		},
 	}
 
 	wsetcookie, _ := response.Get("setcookie", "")
 	*wsetcookie = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 
 			invalidsig := "Function undra-response::setcookie requires the parameter signature: (string, hash)"
 
@@ -87,60 +84,84 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var kahash = (*args[1]).(types.TuskHash)
 			gocookie.Name = (*args[0]).(types.TuskString).ToGoType()
 
-			var testtype = func(kav *types.TuskType, typeof, fieldname string) bool {
+			var testtype = func(kav *types.TuskType, typeof, fieldname string) (bool, *types.TuskError) {
 
 				if kav == nil || (*kav).Type() == "undef" {
-					return false
+					return false, nil
 				}
 
 				if (*kav).Type() != typeof {
-					native.TuskPanic("Expected type "+typeof+" for field "+fieldname+" in an undra-response", line, file, stacktrace)
+					return false, native.TuskPanic("Expected type "+typeof+" for field "+fieldname+" in an undra-response", line, file, stacktrace)
 				}
 
-				return true
+				return true, nil
 			}
 
 			//set all of the fields
 			var tval *types.TuskType
 
 			tval = kahash.AtStr("value")
-			if testtype(tval, "string", "value") {
+			if b, e := testtype(tval, "string", "value"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.Value = (*tval).(types.TuskString).ToGoType()
 			}
 
 			tval = kahash.AtStr("path")
-			if testtype(tval, "string", "path") {
+			if b, e := testtype(tval, "string", "path"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.Path = (*tval).(types.TuskString).ToGoType()
 			}
 
 			tval = kahash.AtStr("domain")
-			if testtype(tval, "string", "domain") {
+			if b, e := testtype(tval, "string", "value"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.Domain = (*tval).(types.TuskString).ToGoType()
 			}
 
 			tval = kahash.AtStr("expires")
-			if testtype(tval, "string", "number") {
+			if b, e := testtype(tval, "string", "expires"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.Expires = time.Now()                                              //set the expires to now
 				gocookie.Expires.Add(time.Duration((*tval).(types.TuskNumber).ToGoType())) //and add to it
 			}
 
 			tval = kahash.AtStr("maxage")
-			if testtype(tval, "string", "number") {
+			if b, e := testtype(tval, "string", "maxage"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.MaxAge = int((*tval).(types.TuskNumber).ToGoType())
 			}
 
 			tval = kahash.AtStr("secure")
-			if testtype(tval, "string", "bool") {
+			if b, e := testtype(tval, "string", "secure"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.Secure = (*tval).(types.TuskBool).ToGoType()
 			}
 
 			tval = kahash.AtStr("httponly")
-			if testtype(tval, "string", "httponly") {
+			if b, e := testtype(tval, "string", "httponly"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.HttpOnly = (*tval).(types.TuskBool).ToGoType()
 			}
 
 			tval = kahash.AtStr("samesite")
-			if testtype(tval, "string", "number") {
+			if b, e := testtype(tval, "string", "samesite"); b {
+				if e != nil {
+					return nil, e
+				}
 				gocookie.SameSite = http.SameSite((*tval).(types.TuskNumber).ToGoType())
 			}
 			///////////////////////
@@ -148,16 +169,16 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			http.SetCookie(res, &gocookie)
 
 			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return &undef, nil
 		},
 	}
 
 	wclearcookie, _ := response.Get("clearcookie", "")
 	*wclearcookie = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 
 			if len(args) != 1 || (*args[0]).Type() != "string" {
-				native.TuskPanic("Function undra-response::clearcookie requires a argument count of 1 with the type of string", line, file, stacktrace)
+				return nil, native.TuskPanic("Function undra-response::clearcookie requires a argument count of 1 with the type of string", line, file, stacktrace)
 			}
 
 			var name = (*args[0]).(types.TuskString).ToGoType()
@@ -168,31 +189,31 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			})
 
 			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return &undef, nil
 		},
 	}
 
 	wredirect, _ := response.Get("redirect", "")
 	*wredirect = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 			if len(args) != 1 || (*args[0]).Type() != "string" {
-				native.TuskPanic("Function undra-response::redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
+				return nil, native.TuskPanic("Function undra-response::redirect requires a argument count of 1 with the type of string", line, file, stacktrace)
 			}
 
 			nurl := (*args[0]).(types.TuskString).ToGoType()
 			http.Redirect(res, req, nurl, http.StatusSeeOther)
 
 			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return &undef, nil
 		},
 	}
 
 	werror, _ := response.Get("error", "")
 	*werror = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 
 			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "number" {
-				native.TuskPanic("Function undra-response::error requires the parameter signature: (string, number)", line, file, stacktrace)
+				return nil, native.TuskPanic("Function undra-response::error requires the parameter signature: (string, number)", line, file, stacktrace)
 			}
 
 			msg := (*args[0]).(types.TuskString).ToGoType()
@@ -201,16 +222,16 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			http.Error(res, msg, err)
 
 			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return &undef, nil
 		},
 	}
 
 	wheader, _ := response.Get("header", "")
 	*wheader = native.TuskGoFunc{
-		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) *types.TuskType {
+		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
 
 			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "string" {
-				native.TuskPanic("Function undra-response::header requires the parameter signature: (string, string)", line, file, stacktrace)
+				return nil, native.TuskPanic("Function undra-response::header requires the parameter signature: (string, string)", line, file, stacktrace)
 			}
 
 			//get the name and value as go strings
@@ -221,7 +242,7 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			res.Header().Set(name, value) //set the header
 
 			var undef types.TuskType = types.TuskUndef{}
-			return &undef
+			return &undef, nil
 		},
 	}
 
