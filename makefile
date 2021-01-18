@@ -2,6 +2,7 @@ ifeq ($(OS),Windows_NT)
 	BINARY = undrastart.exe
 	CLEAN_CMD = del
 else
+	SET_GOPATH = GOPATH=$(GOPATH)
 	BINARY = undrastart.out
 	CLEAN_CMD = rm -f
 endif
@@ -13,7 +14,7 @@ default: all
 
 .PHONY: all
 all:
-	go build -o $(BINARY) undrastart.go
+	$(SET_GOPATH) go build -o $(BINARY) undrastart.go
 
 .PHONY: clean
 clean:

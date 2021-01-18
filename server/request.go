@@ -15,42 +15,42 @@ func createRequest(req http.Request) *types.TuskType {
 	//convert to tusk types
 	var method types.TuskString
 	method.FromGoType(req.Method)
-	rmethod, _ := reqobj.Get("method", "")
+	rmethod, _ := reqobj.Get("method", "", "global")
 	*rmethod = method
 
 	var url types.TuskString
 	url.FromGoType(fmt.Sprint(req.URL) /* makes the url struct into a human reable url */)
-	rurl, _ := reqobj.Get("url", "")
+	rurl, _ := reqobj.Get("url", "", "global")
 	*rurl = url
 
 	var proto types.TuskString
 	proto.FromGoType(req.Proto)
-	rproto, _ := reqobj.Get("protocol", "")
+	rproto, _ := reqobj.Get("protocol", "", "global")
 	*rproto = proto
 
 	var body types.TuskString
 	_body, _ := ioutil.ReadAll(req.Body)
 	body.FromGoType(string(_body))
-	rbody, _ := reqobj.Get("body", "")
+	rbody, _ := reqobj.Get("body", "", "global")
 	*rbody = body
 
 	var host types.TuskString
 	host.FromGoType(req.Host)
-	rhost, _ := reqobj.Get("host", "")
+	rhost, _ := reqobj.Get("host", "", "global")
 	*rhost = host
 
 	var form types.TuskHash
-	rform, _ := reqobj.Get("form", "")
+	rform, _ := reqobj.Get("form", "", "global")
 	*rform = form
 
 	var remoteaddr types.TuskString
 	remoteaddr.FromGoType(req.RemoteAddr)
-	rremoteaddr, _ := reqobj.Get("remoteaddr", "")
+	rremoteaddr, _ := reqobj.Get("remoteaddr", "", "global")
 	*rremoteaddr = remoteaddr
 
 	var requesturi types.TuskString
 	requesturi.FromGoType(req.RequestURI)
-	rrequesturi, _ := reqobj.Get("requesturi", "")
+	rrequesturi, _ := reqobj.Get("requesturi", "", "global")
 	*rrequesturi = requesturi
 	//////////////////////
 
