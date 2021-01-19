@@ -28,8 +28,8 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 				var hash = (*args[0]).(types.TuskHash)
 				var template = make(map[string]string)
 
-				for k, v := range hash.Hash {
-					var strk = k
+				hash.Range(func(k, v *types.TuskType) (types.Returner, *types.TuskError) {
+					var strk = (*k).Format()
 					casted, e := interpreter.Cast(*v, "string", stacktrace, line, file)
 
 					if e != nil {
@@ -48,7 +48,9 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 					res.Header().Set("Content-Type", "text/html")
 					fmt.Fprint(res, templated)
 					res.Header().Set("Content-Type", "text/plain")
-				}
+
+					return types.Returner{}, nil
+				})
 
 				var undef types.TuskType = types.TuskUndef{}
 				return &undef, nil
