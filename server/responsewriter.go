@@ -56,8 +56,9 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 				return &undef, nil
 			}
 
-			return nil, native.TuskPanic("Invalid signature given to render", line, file, stacktrace, native.ErrCodes["SIGNOMATCH"])
+			return nil, nil
 		},
+		Signatures: [][]string{[]string{}, []string{"hash"}},
 	}
 
 	wsend, _ := response.Get("send", "", "global")
@@ -76,23 +77,12 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var undef types.TuskType = types.TuskUndef{}
 			return &undef, nil
 		},
+		Signatures: [][]string{[]string{"..."}},
 	}
 
 	wsetcookie, _ := response.Get("setcookie", "", "global")
 	*wsetcookie = native.TuskGoFunc{
 		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
-
-			invalidsig := "Invalid signature given to setcookie"
-			invalidsigErrCode := native.ErrCodes["SIGNOMATCH"]
-
-			if len(args) != 2 {
-				native.TuskPanic(invalidsig, line, file, stacktrace, invalidsigErrCode).Print()
-			}
-
-			if (*args[0]).Type() != "string" || (*args[1]).Type() != "hash" {
-				native.TuskPanic(invalidsig, line, file, stacktrace, invalidsigErrCode)
-			}
-
 			var gocookie http.Cookie
 			var kahash = (*args[1]).(types.TuskHash)
 			gocookie.Name = (*args[0]).(types.TuskString).ToGoType()
@@ -184,15 +174,12 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var undef types.TuskType = types.TuskUndef{}
 			return &undef, nil
 		},
+		Signatures: [][]string{[]string{"string", "hash"}},
 	}
 
 	wclearcookie, _ := response.Get("clearcookie", "", "global")
 	*wclearcookie = native.TuskGoFunc{
 		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
-
-			if len(args) != 1 || (*args[0]).Type() != "string" {
-				return nil, native.TuskPanic("Invalid signature given to clearcookie", line, file, stacktrace, native.ErrCodes["SIGNOMATCH"])
-			}
 
 			var name = (*args[0]).(types.TuskString).ToGoType()
 			http.SetCookie(res, &http.Cookie{ //set the expires to 1970, Jan 1 (unix epoch)
@@ -204,14 +191,12 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var undef types.TuskType = types.TuskUndef{}
 			return &undef, nil
 		},
+		Signatures: [][]string{[]string{"string"}},
 	}
 
 	wredirect, _ := response.Get("redirect", "", "global")
 	*wredirect = native.TuskGoFunc{
 		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
-			if len(args) != 1 || (*args[0]).Type() != "string" {
-				return nil, native.TuskPanic("Invalid signature given to redirect", line, file, stacktrace, native.ErrCodes["SIGNOMATCH"])
-			}
 
 			nurl := (*args[0]).(types.TuskString).ToGoType()
 			http.Redirect(res, req, nurl, http.StatusSeeOther)
@@ -219,15 +204,12 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var undef types.TuskType = types.TuskUndef{}
 			return &undef, nil
 		},
+		Signatures: [][]string{[]string{"string"}},
 	}
 
 	werror, _ := response.Get("error", "", "global")
 	*werror = native.TuskGoFunc{
 		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
-
-			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "number" {
-				return nil, native.TuskPanic("Invalid signature given to error", line, file, stacktrace, native.ErrCodes["SIGNOMATCH"])
-			}
 
 			msg := (*args[0]).(types.TuskString).ToGoType()
 			err := int((*args[1]).(types.TuskNumber).ToGoType())
@@ -237,15 +219,12 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var undef types.TuskType = types.TuskUndef{}
 			return &undef, nil
 		},
+		Signatures: [][]string{[]string{"string", "number"}},
 	}
 
 	wheader, _ := response.Get("header", "", "global")
 	*wheader = native.TuskGoFunc{
 		Function: func(args []*types.TuskType, stacktrace []string, line uint64, file string, instance *types.Instance) (*types.TuskType, *types.TuskError) {
-
-			if len(args) != 2 || (*args[0]).Type() != "string" || (*args[1]).Type() != "string" {
-				return nil, native.TuskPanic("Invalid signature given to header", line, file, stacktrace, native.ErrCodes["SIGNOMATCH"])
-			}
 
 			//get the name and value as go strings
 			name := (*args[0]).(types.TuskString).ToGoType()
@@ -257,6 +236,7 @@ func createResponse(res http.ResponseWriter, req *http.Request) *types.TuskType 
 			var undef types.TuskType = types.TuskUndef{}
 			return &undef, nil
 		},
+		Signatures: [][]string{[]string{"string", "string"}},
 	}
 
 	var tusktype types.TuskType = response

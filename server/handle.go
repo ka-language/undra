@@ -36,8 +36,8 @@ func getfmt(fpath string) string {
 		return ".oat"
 	}
 
-	if strings.HasPrefix(string(read), "<!--fmt:kal-->") {
-		return ".kal"
+	if strings.HasPrefix(string(read), "<!--fmt:tusk-->") {
+		return ".tusk"
 	} else if strings.HasPrefix(string(read), "<!--fmt:klr-->") {
 		return ".klr"
 	}
@@ -59,18 +59,18 @@ func handle(res http.ResponseWriter, req *http.Request) {
 	}
 
 	//remove the extension, and replace it with .oat (or .tusk or .klr)
-	kastname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
+	oatname := strings.TrimSuffix(req.URL.Path, filepath.Ext(req.URL.Path)) + getfmt(req.URL.Path)
 
 	//prepend the server path
-	kastf := path.Join("server", kastname)
+	oatf := path.Join("server", oatname)
 
-	if _, f := os.Stat(kastf); !os.IsNotExist(f) {
+	if _, f := os.Stat(oatf); !os.IsNotExist(f) {
 
 		var tmp = params
-		tmp.Name = kastname
+		tmp.Name = oatname
 
 		//load the oat (or tusk or kayl) file using goat
-		lib, e := goat.LoadLibrary(kastf, tmp)
+		lib, e := goat.LoadLibrary(oatf, tmp)
 
 		if e != nil {
 			fmt.Println(e)
